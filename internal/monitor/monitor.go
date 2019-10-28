@@ -1,11 +1,15 @@
 package monitor
 
 import (
+	"log"
 	"regexp"
+	"time"
 
 	"github.com/dghubble/go-twitter/twitter"
 	"github.com/dghubble/oauth1"
 )
+
+const tweetTimeFormat = "Jan 02, 2006"
 
 type MonitorClient struct {
 	client *twitter.Client
@@ -36,15 +40,46 @@ func (c *MonitorClient) StopMonitor() {
 	}
 }
 
-func (c *MonitorClient) StartMonitor() error {
+func (c *MonitorClient) StartSampleStreaming() error {
 	demux := twitter.NewSwitchDemux()
 	demux.Tweet = func(tweet *twitter.Tweet) {
-		processTweet(tweet.Text)
+		t, err := time.Parse(time.RubyDate, tweet.CreatedAt)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		log.Printf("%v", tweet)
+	}
+	var err error
+	filterParams := &twitter.StreamSampleParams{
+		StallWarnings: twitter.Bool(true),
+	}
+	c.stream, err = c.client.Streams.Sample(filterParams)
+	if err != nil {
+		return err
+	}
+
+	go demux.HandleChan(c.stream.Messages)
+	return nil
+}
+
+func (c *MonitorClient) StartMonitor(userID string, tweetCallback func(keys []string, timestamp string)) error {
+	demux := twitter.NewSwitchDemux()
+	demux.Tweet = func(tweet *twitter.Tweet) {
+		found, keys := processTweet(tweet.Text)
+		if found {
+			timestamp, err := time.Parse(time.RubyDate, tweet.CreatedAt)
+			if err != nil {
+				log.Println(err)
+			} else {
+				go tweetCallback(keys, timestamp.Format(tweetTimeFormat))
+			}
+		}
 	}
 
 	var err error
 	filterParams := &twitter.StreamFilterParams{
-		Follow:        []string{"8369072"},
+		Follow:        []string{userID},
 		StallWarnings: twitter.Bool(true),
 	}
 
@@ -54,7 +89,6 @@ func (c *MonitorClient) StartMonitor() error {
 	}
 
 	go demux.HandleChan(c.stream.Messages)
-
 	return nil
 }
 

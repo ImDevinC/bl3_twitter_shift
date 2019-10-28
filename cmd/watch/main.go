@@ -1,11 +1,12 @@
 package main
 
 import (
-	"github.com/imdevinc/bl3_twitter_shift/internal/monitor"
 	"os"
+
+	"github.com/imdevinc/bl3_twitter_shift/internal/monitor"
 )
 
 func main() {
-	client := monitor.NewTwitterClient(os.Getenv("TWITTER_KEY"), os.Getenv("TWITTER_SECRET"))
-	client.StartMonitor()
+	client := monitor.NewTwitterClient(os.Getenv("CONSUMER_KEY"), os.Getenv("CONSUMER_SECRET"), os.Getenv("ACCESS_TOKEN"), os.Getenv("ACCESS_SECRET"))
+	client.StartMonitor(os.Getenv("TWITTER_USER"))
 }

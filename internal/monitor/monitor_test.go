@@ -30,7 +30,15 @@ func TestNewTwitterClient(t *testing.T) {
 
 func TestTwitterStream(t *testing.T) {
 	client := NewTwitterClient(os.Getenv("CONSUMER_KEY"), os.Getenv("CONSUMER_SECRET"), os.Getenv("ACCESS_TOKEN"), os.Getenv("ACCESS_SECRET"))
-	err := client.StartMonitor()
+	err := client.StartMonitor(os.Getenv("TWITTER_USER"))
+	assert.Nil(t, err, err)
+	time.Sleep(10 * time.Second)
+	client.StopMonitor()
+}
+
+func TestSampleStream(t *testing.T) {
+	client := NewTwitterClient(os.Getenv("CONSUMER_KEY"), os.Getenv("CONSUMER_SECRET"), os.Getenv("ACCESS_TOKEN"), os.Getenv("ACCESS_SECRET"))
+	err := client.StartSampleStreaming()
 	assert.Nil(t, err, err)
 	time.Sleep(10 * time.Second)
 	client.StopMonitor()
