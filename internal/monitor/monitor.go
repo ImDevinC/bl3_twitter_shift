@@ -67,9 +67,11 @@ func (c *MonitorClient) StartSampleStreaming() error {
 func (c *MonitorClient) StartMonitor(userID string, tweetCallback func(keys []string, timestamp string)) error {
 	demux := twitter.NewSwitchDemux()
 	demux.Tweet = func(tweet *twitter.Tweet) {
-		log.Println("Found tweet from monitored user, taking action")
+		log.Println("Found tweet from monitored user.")
+		log.Println("%v", tweet)
 		found, keys := processTweet(tweet.Text)
 		if found {
+			log.Println("Identified keys in the tweet.")
 			timestamp, err := time.Parse(time.RubyDate, tweet.CreatedAt)
 			if err != nil {
 				log.Println(err)
