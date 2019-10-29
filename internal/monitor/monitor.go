@@ -67,8 +67,13 @@ func (c *MonitorClient) StartSampleStreaming() error {
 func (c *MonitorClient) StartMonitor(userID string, tweetCallback func(keys []string, timestamp string)) error {
 	demux := twitter.NewSwitchDemux()
 	demux.Tweet = func(tweet *twitter.Tweet) {
+		log.Println("%v", tweet.User)
+		log.Println("%v", tweet.User.ID)
+		log.Println("%v", tweet.User.Name)
+		if string(tweet.User.ID) != userID {
+			return
+		}
 		log.Println("Found tweet from monitored user.")
-		log.Println("%v", tweet)
 		found, keys := processTweet(tweet.Text)
 		if found {
 			log.Println("Identified keys in the tweet.")
