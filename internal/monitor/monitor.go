@@ -43,12 +43,13 @@ func (c *MonitorClient) StopMonitor() {
 func (c *MonitorClient) StartSampleStreaming() error {
 	demux := twitter.NewSwitchDemux()
 	demux.Tweet = func(tweet *twitter.Tweet) {
-		t, err := time.Parse(time.RubyDate, tweet.CreatedAt)
+		timestamp, err := time.Parse(time.RubyDate, tweet.CreatedAt)
 		if err != nil {
 			log.Println(err)
 			return
 		}
 		log.Printf("%v", tweet)
+		log.Println(timestamp.Format(tweetTimeFormat))
 	}
 	var err error
 	filterParams := &twitter.StreamSampleParams{
