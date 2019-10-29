@@ -67,10 +67,9 @@ func (c *MonitorClient) StartSampleStreaming() error {
 func (c *MonitorClient) StartMonitor(userID string, tweetCallback func(keys []string, timestamp string)) error {
 	demux := twitter.NewSwitchDemux()
 	demux.Tweet = func(tweet *twitter.Tweet) {
-		log.Println("%v", tweet.User)
-		log.Println("%v", tweet.User.ID)
-		log.Println("%v", tweet.User.Name)
-		if string(tweet.User.ID) != userID {
+		log.Printf("%s -- %s\n", tweet.User.IDStr, tweet.User.ScreenName)
+		log.Printf("%v\n", tweet)
+		if tweet.User.IDStr != userID {
 			return
 		}
 		log.Println("Found tweet from monitored user.")
