@@ -67,6 +67,7 @@ func (c *MonitorClient) StartSampleStreaming() error {
 func (c *MonitorClient) StartMonitor(userID string, tweetCallback func(keys []string, timestamp string)) error {
 	demux := twitter.NewSwitchDemux()
 	demux.Tweet = func(tweet *twitter.Tweet) {
+		log.Println("Found tweet from monitored user, taking action")
 		found, keys := processTweet(tweet.Text)
 		if found {
 			timestamp, err := time.Parse(time.RubyDate, tweet.CreatedAt)
@@ -89,6 +90,7 @@ func (c *MonitorClient) StartMonitor(userID string, tweetCallback func(keys []st
 		return err
 	}
 
+	log.Println("Waiting for messages...")
 	go demux.HandleChan(c.stream.Messages)
 	return nil
 }

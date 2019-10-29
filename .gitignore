@@ -1,5 +1,6 @@
 # VSCode Folders
 .vscode/*
+!.vscode/settings.json
 *.code-workspace
 
 # General
@@ -28,3 +29,5 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+
+.env
